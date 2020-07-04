@@ -7,7 +7,7 @@ for i=1:5
     disp(['Now testing: ' flux.conds{i}])
     sol{i} = solveLP(ecModels{i});
     [capUsage{i}, absUsage{i}, protName{i}]=enzymeUsage(ecModels{i},sol{i}.x,true);
-    printFluxes(ecModels{i},sol{i}.x,false,0,fullfile('..','results','modelSimulations',['allFluxes_' flux.conds{i},'.txt']),'%rxnID\t%rxnName\t%eqn\t%flux\n');
+    printFluxes(ecModels{i},sol{i}.x,false,0,fullfile('..','results','modelSimulation',['allFluxes_' flux.conds{i},'.txt']),'%rxnID\t%rxnName\t%eqn\t%flux\n');
 end
 
 %% Map enzymes to reactions and their subsystems
