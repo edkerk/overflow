@@ -28,7 +28,7 @@ end
 if isfield(ecModel,'enzymes')
     protIdx     = find(contains(ecModel.rxnNames,ecModel.enzymes));
     matchProt   = regexprep(ecModel.rxnNames(protIdx),'(draw_)?prot_','');
-    matchProt   = regexprep(matchProt,'_exchange','');
+    matchProt   = regexprep(matchProt,'_exchange.*','');
     [~,b]       = ismember(ecModel.enzymes, matchProt);
 
     absUsage    = fluxes(protIdx);

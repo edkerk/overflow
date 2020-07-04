@@ -39,25 +39,8 @@ end
 % cd GECKO/geckomat
 % [ecModel,ecModel_batch] = enhanceGEM(model,'RAVEN');
 % cd(code)
-% save('../models/ecYeastGEM.mat',{'ecModel','ecModel_batch'});
+% save('../models/ecYeastGEM.mat','ecModel','ecModel_batch');
 load('../models/ecYeastGEM.mat');
-
-% % % Instead of ecYeast-GEM 8.1.3, use 8.3.5 with the following code.
-% % % Clone ecYeastGEM and checkout ecYeastGEM 8.3.5. The model will be kept in
-% % % the overflow repository, so this code only needs to be run (and modified)
-% % % when a new version of ecYeastGEM will be used.
-% % git('clone https://github.com/SysBioChalmers/ecModels.git')
-% % cd ecModels
-% % git('checkout 574fa93d39c78f6206cee55770ad99d5c5828d7b -b overflow')
-% % copyfile ecYeastGEM/model/ecYeastGEM_batch.xml ../../models/
-% % copyfile ecYeastGEM/model/ecYeastGEM.mat ../../models/
-% % copyfile ecYeastGEM/model/ecYeastGEM_batch.mat ../../models/
-% % mkdir ../../models/prot_constrained/
-% % cd(code)
-% % load ('../models/ecYeastGEM.mat')
-% % load ('../models/ecYeastGEM_batch.mat')
-% % ecYeastGEM_batch.mets = regexprep(ecYeastGEM_batch.mets,'\[(.*)\]$','');
-% % ecYeastGEM.mets = regexprep(ecYeastGEM.mets,'\[(.*)\]$','');
 cd(code)
 %% Prepare data
 %Load proteomics data
@@ -66,7 +49,7 @@ prot.cond = textscan(fID,['%s' repmat(' %s',1,17)],1);
 prot.data = textscan(fID,['%s %s' repmat(' %f',1,16)],'TreatAsEmpty',{'NA','na','NaN'});
 prot.cond = [prot.cond{3:end}];
 prot.IDs  = prot.data{1};
-prot.data = prot.data(3:end);
+prot.data = cell2mat(prot.data(3:end));
 fclose(fID);
 
 %Load total protein content and fermentation data
@@ -93,12 +76,17 @@ cd(code)
 %Set some additional parameters
 oxPhos = ecModel.rxns(startsWith(ecModel.rxns,params.oxPhos));
 grouping=[3 3 3 3 4];
+clear repl
+for i=1:length(grouping)
+    try
+        repl.first(i)=repl.last(end)+1;
+        repl.last(i)=repl.last(end)+grouping(i);
+    catch
+        repl.first=1;
+        repl.last=grouping(1);
+    end
+end
 %Get indexes for carbon source uptake and biomass pseudoreactions
 positionsEC(1) = find(strcmpi(ecModel.rxnNames,params.c_source));
 positionsEC(2) = find(strcmpi(ecModel.rxns,params.bioRxn));
-%Remove prot_abundance.txt and relative_proteomics.txt files
-%(for f factor calculation)
-cd GECKO/geckomat/limit_proteins/
-f       = measureAbundance(ecModel.enzymes); %Protein mass in model/Total theoretical proteome
-cd(code)
 clear ans fID data byProds fileNames GECKO_path i fID
