@@ -49,7 +49,9 @@ end
 %% All usage per subSystem
 head={'protID','subSys','CN04','CN22','CN38','CN78','hGR'};
 all=cell2table([out.enzymes,out.subSys,num2cell(out.capUse)],'VariableNames',head);
-writetable(all,fullfile('..','results','enzymeUsage','enzymeUsages.txt'),'Delimiter','\t')
+writetable(all,fullfile('..','results','enzymeUsage','enzymeCapUsages.txt'),'Delimiter','\t')
+all=cell2table([out.enzymes,out.subSys,num2cell(out.absUse)],'VariableNames',head);
+writetable(all,fullfile('..','results','enzymeUsage','enzymeAbsUsages.txt'),'Delimiter','\t')
 
 %% Summarize per subSystem
 subSysUse.subSys = unique(out.subSys);
