@@ -13,6 +13,12 @@ if ~exist('GECKO', 'dir')
     git('checkout tags/v2.0.0 -b overflow')
     cd(code)
 end
+if any(contains(path,'constrainEnzymes.m'))
+    error(['It appears that a GECKO installation is present in the MATLAB path.' ...
+        ' This could interfere with the functions in this repository.' ...
+        ' You are recommended to remove all GECKO subdirectories from' ...
+        ' the MATLAB path, which is done easiest by running ''pathtool''.'])
+end
 
 % Replace custom GECKO scripts
 fileNames = struct2cell(dir('customGECKO'));
@@ -24,24 +30,26 @@ for i = 1:length(fileNames)
     disp(['Replaced ' fileNames{i} ' at ' GECKO_path.folder '\'])
 end
 
-% % Get yeast-GEM 8.1.3 if ecYeast-GEM is first to be reconstructed.
-% if ~exist('yeast-GEM', 'dir')
-%     git('clone https://github.com/SysBioChalmers/yeast-GEM.git')
-%     cd yeast-GEM
-%     git('checkout tags/v8.1.3 -b overflow')
-%     cd(code)
-%     copyfile yeast-GEM/ModelFiles/xml/yeastGEM.xml ../models/yeastGEM.xml
-% end
+% Get yeast-GEM 8.1.3 if ecYeast-GEM is first to be reconstructed.
+if ~exist('../models/yeastGEM.xml', 'file')
+    git('clone https://github.com/SysBioChalmers/yeast-GEM.git')
+    cd yeast-GEM
+    git('checkout tags/v8.1.3 -b overflow')
+    cd(code)
+    copyfile yeast-GEM/ModelFiles/xml/yeastGEM.xml ../models/yeastGEM.xml
+end
 
-% % Reconstruct ecYeast-GEM 8.1.3
-% model = importModel('../models/yeastGEM.xml');
-% model.mets = regexprep(model.mets,'\[(.*)\]$','');
-% cd GECKO/geckomat
-% [ecModel,ecModel_batch] = enhanceGEM(model,'RAVEN');
-% cd(code)
-% save('../models/ecYeastGEM.mat','ecModel','ecModel_batch');
-load('../models/ecYeastGEM.mat');
-cd(code)
+% Reconstruct ecYeast-GEM 8.1.3
+if ~exist('../models/ecYeastGEM.mat','file')
+    model = importModel('../models/yeastGEM.xml');
+    model.mets = regexprep(model.mets,'\[(.*)\]$','');
+    cd GECKO/geckomat
+    [ecModel,ecModel_batch] = enhanceGEM(model,'RAVEN');
+    cd(code)
+    save('../models/ecYeastGEM.mat','ecModel','ecModel_batch');
+else
+    load('../models/ecYeastGEM.mat');
+end
 %% Prepare data
 %Load proteomics data
 fID       = fopen('../data/abs_proteomics.txt');
