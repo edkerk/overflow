@@ -49,9 +49,9 @@ pathways={'sce03010  Ribosome'};
 clear repRibo rmRibo idx data fid ans
 %% Modify reactions
 adjusted=cell.empty();
-for cond=1:numel(ecModels);
-    disp(['Add ribosome subunits to condition: ' flux.conds{cond}])
-    model=ecModels{cond};
+for j=1:numel(ecModels);
+    disp(['Add ribosome subunits to condition: ' flux.conds{j}])
+    model=ecModels{j};
     %Add enzymes and genes
     model.enzymes=[model.enzymes;ribo];
     model.enzNames=[model.enzNames;enzNames];
@@ -64,9 +64,9 @@ for cond=1:numel(ecModels);
     model.pathways=[model.pathways;repmat(pathways,numel(ribo),1)];
 
     %Include new amino acid pseudometabolite
-    metsToAdd.mets='aminoAcids';
-    metsToAdd.metNames='amino acids for protein';
-    metsToAdd.compartments='c';
+    metsToAdd.mets={'aminoAcids'};
+    metsToAdd.metNames={'amino acids for protein'};
+    metsToAdd.compartments={'c'};
     model=addMets(model,metsToAdd);
     
     %Modify protein pseudoreaction to produce amino acid pseudometabolite
@@ -87,10 +87,10 @@ for cond=1:numel(ecModels);
     riboKcat=10.5*3600; %10.5 aa/s -> p hour
     riboKcat=mmolAA/riboKcat; %compensate for the amount of amino acids elongated
     % Include new reaction representing ribosomes (=translation)
-    rxnsToAdd.rxns='translation';
+    rxnsToAdd.rxns={'translation'};
     rxnsToAdd.mets=[model.mets(protMetIdx),model.mets(aaMetIdx),riboToAdd.mets'];
     rxnsToAdd.stoichCoeffs=[1,-1,repmat(-riboKcat,1,numel(riboToAdd.mets))];
-    rxnsToAdd.subSystem='sce03010  Ribosome';
+    rxnsToAdd.subSystem={'sce03010  Ribosome'};
     rxnsToAdd.grRules={strjoin(enzGenes,' and ')};
     model=addRxns(model,rxnsToAdd);
     
@@ -101,25 +101,25 @@ for cond=1:numel(ecModels);
     %Add UB for enzyme exchange reactions based on measurements.
     %If UB is too low, then adjust to value predicted by model.
     cd GECKO/geckomat/utilities/integrate_proteomics
-    abundances   = prot.data(:,repl.first(cond):repl.last(cond));
+    abundances   = prot.data(:,repl.first(j):repl.last(j));
     [pIDs, filtAbundances] = filter_ProtData(prot.IDs,abundances,1.96,true);
     cd ../../../..
     sol=solveLP(model);
     for i=riboExchId(1):riboExchId(2)
         protId=regexprep(model.rxnNames{i},'prot_(......).*','$1');
-        j=find(strcmp(protId,pIDs));
-        if ~isempty(j)
+        k=find(strcmp(protId,pIDs));
+        if ~isempty(k)
             model.rxns{i}=['prot_' protId '_exchange'];
             model.rxnNames{i}=['prot_' protId '_exchange'];
-            model.concs(strcmp(protId,model.enzymes))=filtAbundances(j);
-            if sol.x(i)<filtAbundances(j)
-                model.ub(i)=filtAbundances(j);
+            model.concs(strcmp(protId,model.enzymes))=filtAbundances(k);
+            if sol.x(i)<filtAbundances(k)
+                model.ub(i)=filtAbundances(k);
             else
                 model.ub(i)=sol.x(i)*1.01;
                 adjusted{end+1,1}=protId;
-                adjusted{end,2}=filtAbundances(j);
+                adjusted{end,2}=filtAbundances(k);
                 adjusted{end,3}=sol.x(i)*1.01;
-                adjusted{end,4}=flux.conds{cond};
+                adjusted{end,4}=flux.conds{j};
                 fprintf('%s abundance adjusted. Measured: %e / Adjusted: %e\n',adjusted{end,1:3})
             end
         else
@@ -128,7 +128,7 @@ for cond=1:numel(ecModels);
             model.rxnNames{i}=['draw_prot_' protId];
         end
     end
-    ecModels{cond}=model;
+    ecModels{j}=model;
 end
 adjusted=adjusted';
 fid=fopen(fullfile('..','results','modelGeneration','modifiedRibosomeSubunits.txt'),'w');
