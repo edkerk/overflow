@@ -1,6 +1,9 @@
 % This script generates condition-specific proteome-integrated ecModels.
 % Prior to running this script, run prepareEnvironment.
 prepareEnvironment
+cd GECKO/geckomat/limit_proteins
+GAM = fitGAM(ecModel_batch);
+cd(code)
 for i=1:length(flux.conds)
     disp(['Construct ecModel for condition: ' flux.conds{i}])
     
@@ -18,7 +21,6 @@ for i=1:length(flux.conds)
     %Filter proteomics data, to only keep high quality measurements
     cd ../utilities/integrate_proteomics
     [pIDs, filtAbundances] = filter_ProtData(prot.IDs,abundances,1.96,true);
-    sumP = sum(mean(filtAbundances,2,'omitnan'),'omitnan');
 
     disp(['Filtered out ' num2str(round((1-(numel(pIDs)/numel(prot.IDs)))*100,1)) '% of protein measurements due to low quality.'])
     cd ..
@@ -33,10 +35,7 @@ for i=1:length(flux.conds)
     ecModelP  = changeMedia_batch(ecModel,params.c_source);
     tempModel = changeMedia_batch(ecModel_batch,params.c_source);
     cd ../limit_proteins
-    %Use ecModel_batch to rescale the biomass and estimate the GAM
-    [~,GAM] = scaleBioMass(tempModel,flux.Ptot(i),[],true);
-    %Rescale the ecModel that will have proteomics integrated and reuse the
-    %GAM calculated above
+    %Rescale the ecModel that will have proteomics integrated
     ecModelP = scaleBioMass(ecModelP,flux.Ptot(i),GAM,true);
     disp(' ')
     
@@ -45,13 +44,13 @@ for i=1:length(flux.conds)
     %and flexibilization
     expData  = [flux.GUR(i),flux.CO2prod(i),flux.OxyUptake(i)];
     flexGUR  = 1.05*flux.GUR(i); % Allow 5% deviation from measured glucose uptake
-    cd ../../..
-    ecModelP = DataConstrains(ecModelP,flux.byProds,flux.byP_flux(i,:),1.1);
     
     %Get a temporary model structure with the same constraints to be used
     %for minimal enzyme requirements analysis. For all measured enzymes
     %(present in the dataset) a minimal usage is obtained from a FBA
     %simulation with the ecModel_batch, then
+    tempModel = scaleBioMass(tempModel,flux.Ptot(i),GAM,true);
+    cd ../../..
     tempModel       = DataConstrains(tempModel,flux.byProds,flux.byP_flux(i,:),1.1);
     tempModel       = setParam(tempModel,'ub',positionsEC(1),flexGUR);
     [matchedEnz,iA] = intersect(pIDs,tempModel.enzymes);
@@ -71,6 +70,7 @@ for i=1:length(flux.conds)
     
     %% Populate model with proteome data
     %Get model with proteomics
+    ecModelP = DataConstrains(ecModelP,flux.byProds,flux.byP_flux(i,:),1.1);
     cd GECKO/geckomat/limit_proteins
     disp(['Incorporation of proteomics constraints for ' flux.conds{i} ' condition'])
     sumPfilt = sum(filtAbundances);
