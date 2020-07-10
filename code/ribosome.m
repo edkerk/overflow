@@ -1,14 +1,14 @@
 % This script takes the ecmodels reconstructed by generateProtModels
 % and adds ribosome subunits to a translation pseudoreaction.
 
-prepareEnvironment
+%prepareEnvironment % Run if required
+clear oxPhos params positionsEC grouping ecModel ecModel_batch f
+
 load('../models/ecModel_P_CN4.mat')
 load('../models/ecModel_P_CN22.mat')
 load('../models/ecModel_P_CN38.mat')
 load('../models/ecModel_P_CN78.mat')
 load('../models/ecModel_P_hGR.mat')
-
-clear oxPhos params positionsEC grouping ecModel ecModel_batch
 
 ecModels{1}=ecModelP_CN4;
 ecModels{2}=ecModelP_CN22;
@@ -18,22 +18,24 @@ ecModels{5}=ecModelP_hGR;
 
 %% Load ribosome information
 fid=fopen('../data/ribosome.txt');
-data=textscan(fid,'%q %q %q %q %q','HeaderLines',1,'Delimiter','\t');
+data=textscan(fid,'%q %q %q %q %q %q','HeaderLines',1,'Delimiter','\t');
 fclose(fid);
 ribo=data{1};
 
-%Keep only the most abundant subunite (>1e5, measured in all samples
+%Keep only the subunits that are also in the proteomics data
 [~,repRibo.dataIdx]=ismember(ribo,prot.IDs);
 repRibo.protein=ribo(repRibo.dataIdx>0);
 repRibo.dataIdx(repRibo.dataIdx==0)=[];
 repRibo.avgLevel=mean(prot.data(repRibo.dataIdx,:),2);
-%Density plot to see bi-modal distribution of subunit abundances
+
+%Density plot to see distribution of subunit abundances
 [f,xi]=ksdensity(log10(repRibo.avgLevel),'Bandwidth',0.1);
 plot(xi,f);
 xlabel('Subunit abundance (log10(mmol/gDCW))');
 ylabel('Density');
 title('Distribution of average ribosomal subunit abundances');
 saveas(gca,fullfile('..','results','modelGeneration','average_riboSubunit_abundance.pdf'));
+
 %Only include ribosomal subunite with abundance over 1e-5 mmol/gDCW 
 rmRibo=repRibo.avgLevel<1e-5 | isnan(repRibo.avgLevel);
 ribo=repRibo.protein(~rmRibo);
@@ -46,7 +48,7 @@ MWs=str2double(data{4}(idx))/1000;
 sequences=data{5}(idx);
 pathways={'sce03010  Ribosome'};
 
-clear repRibo rmRibo idx data fid ans
+clear repRibo rmRibo idx data fid ans f xi
 %% Modify reactions
 adjusted=cell.empty();
 for j=1:numel(ecModels);
@@ -84,7 +86,7 @@ for j=1:numel(ecModels);
     %Determine stoichiometric coefficient of ribosomes
     mmolAA=full(model.S(:,protRxnIdx));
     mmolAA=-sum(mmolAA(mmolAA<0)); %mmol amino acids in biomass
-    riboKcat=10.5*3600; %10.5 aa/s -> p hour
+    riboKcat=10.5*3600; %10.5 aa/sec (doi:10.1042/bj1680409) -> aa/hour
     riboKcat=mmolAA/riboKcat; %compensate for the amount of amino acids elongated
     % Include new reaction representing ribosomes (=translation)
     rxnsToAdd.rxns={'translation'};
@@ -129,6 +131,8 @@ for j=1:numel(ecModels);
         end
     end
     ecModels{j}=model;
+    eval(['ecModelP_' flux.conds{j} ' = model;']);
+    save(fullfile('..','models',['ecModel_P_' flux.conds{j}]), ['ecModelP_' flux.conds{j}]);
 end
 adjusted=adjusted';
 fid=fopen(fullfile('..','results','modelGeneration','modifiedRibosomeSubunits.txt'),'w');
@@ -136,7 +140,7 @@ fprintf(fid,'protein_IDs previous_values modified_values condition\n');
 fprintf(fid,'%s %f %f %s\n',adjusted{:});
 fclose(fid);
 
-clear cond abundances aaMetIdx filtAbundances i j genesToAdd metsToAdd mmolAA
+wclear cond abundances aaMetIdx filtAbundances i j genesToAdd metsToAdd mmolAA
 clear protId prot pIDs pathways MWs model enzGenes enzNames enzAdjust protMetIdx
 clear protRxnIdx repl sequences riboExchId riboKcat riboToAdd rxnsToAdd
 clear sequences sol fid adjusted
