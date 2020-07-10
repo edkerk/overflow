@@ -1,4 +1,5 @@
 protein_IDs previous_values modified_values condition
+P04147 0.000013 0.000029 hGR
 P05739 0.000028 0.000029 hGR
 P05750 0.000024 0.000029 hGR
 P05756 0.000026 0.000029 hGR

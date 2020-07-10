@@ -140,7 +140,7 @@ fprintf(fid,'protein_IDs previous_values modified_values condition\n');
 fprintf(fid,'%s %f %f %s\n',adjusted{:});
 fclose(fid);
 
-wclear cond abundances aaMetIdx filtAbundances i j genesToAdd metsToAdd mmolAA
+clear cond abundances aaMetIdx filtAbundances i j genesToAdd metsToAdd mmolAA
 clear protId prot pIDs pathways MWs model enzGenes enzNames enzAdjust protMetIdx
 clear protRxnIdx repl sequences riboExchId riboKcat riboToAdd rxnsToAdd
 clear sequences sol fid adjusted

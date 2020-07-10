@@ -33,17 +33,19 @@ for i = 1:length(fileNames)
 end
 
 % Get yeast-GEM 8.1.3 if ecYeast-GEM is first to be reconstructed.
-if ~exist('../models/yeastGEM.xml', 'file')
+if ~exist('../models/yeastGEM_v8.1.3.xml', 'file') | ~exist('../models/yeastGEM_v8.3.4.xml', 'file')
     git('clone https://github.com/SysBioChalmers/yeast-GEM.git')
     cd yeast-GEM
-    git('checkout tags/v8.1.3 -b overflow')
+    git('checkout tags/v8.1.3 -b v8.1.3')
+    copyfile ModelFiles/xml/yeastGEM.xml ../../models/yeastGEM_v8.1.3.xml
+    git('checkout tags/v8.3.4 -b v8.3.4')
+    copyfile ModelFiles/xml/yeastGEM.xml ../../models/yeastGEM_v8.3.4.xml
     cd(code)
-    copyfile yeast-GEM/ModelFiles/xml/yeastGEM.xml ../models/yeastGEM.xml
 end
 
 % Reconstruct ecYeast-GEM 8.1.3
 if ~exist('../models/ecYeastGEM.mat','file')
-    model = importModel('../models/yeastGEM.xml');
+    model = importModel('../models/yeastGEM_v8.1.3.xml');
     model.mets = regexprep(model.mets,'\[(.*)\]$','');
     cd GECKO/geckomat
     [ecModel,ecModel_batch] = enhanceGEM(model,'RAVEN');

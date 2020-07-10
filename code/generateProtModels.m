@@ -53,6 +53,8 @@ for i=1:length(flux.conds)
     %(present in the dataset) a minimal usage is obtained from a FBA
     %simulation with the ecModel_batch, and abundance data is adjusted if
     %required
+    tempModel = scaleBioMass(tempModel,flux.Ptot(i),GAM,true);
+
     cd ../../..
     tempModel       = DataConstrains(tempModel,flux.byProds,flux.byP_flux(i,:),1.1);
     tempModel       = setParam(tempModel,'ub',positionsEC(1),flexGUR);
@@ -98,7 +100,6 @@ for i=1:length(flux.conds)
     save(fullfile('..','models',['ecModel_P_' flux.conds{i}]), ['ecModelP_' flux.conds{i}]);
     writetable(modificationsT,fullfile('..','results','modelGeneration',['modifiedEnzymes_' flux.conds{i} '.txt']),'Delimiter','\t')
 end
-
 
 clear abundances ans coverage ecModel ecModel_batch ecModelP* enzIndex
 clear enzModel expData f filtAbundances flexGUR GAM grouping i iA j
