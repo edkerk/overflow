@@ -1,6 +1,6 @@
-% This script generates condition-specific proteome-integrated ecModels.
-% Prior to running this script, run prepareEnvironment.
-prepareEnvironment
+% This script generates condition-specific proteome-integrated ec-models.
+
+%prepareEnvironment % Run if required
 cd GECKO/geckomat/limit_proteins
 GAM = fitGAM(ecModel_batch);
 cd(code)
@@ -30,26 +30,29 @@ for i=1:length(flux.conds)
        [filtAbundances,pIDs] = fixComplex(oxPhos{j},ecModel,filtAbundances,pIDs); end
     
     %% Scale biomass to new protein content and recalculate GAM
-    %Set minimal medium
+    %Set minimal medium for the model which will have proteomics
+    %integrated, in addition to tempModel that will be used to determine
+    %minimum required protein abundances
     cd ../kcat_sensitivity_analysis
     ecModelP  = changeMedia_batch(ecModel,params.c_source);
     tempModel = changeMedia_batch(ecModel_batch,params.c_source);
     cd ../limit_proteins
-    %Rescale the ecModel that will have proteomics integrated
+    %Rescale the biomass to the changed protein content. Use the predefined
+    %GAM and add the macromolecule polymerization cost.
     ecModelP = scaleBioMass(ecModelP,flux.Ptot(i),GAM,true);
-    disp(' ')
     
     %% Simulate condition in protein pool model to determine minimum enzyme levels
     %Block production of non-observed metabolites before data incorporation
     %and flexibilization
+    
     expData  = [flux.GUR(i),flux.CO2prod(i),flux.OxyUptake(i)];
     flexGUR  = 1.05*flux.GUR(i); % Allow 5% deviation from measured glucose uptake
     
     %Get a temporary model structure with the same constraints to be used
     %for minimal enzyme requirements analysis. For all measured enzymes
     %(present in the dataset) a minimal usage is obtained from a FBA
-    %simulation with the ecModel_batch, then
-    tempModel = scaleBioMass(tempModel,flux.Ptot(i),GAM,true);
+    %simulation with the ecModel_batch, and abundance data is adjusted if
+    %required
     cd ../../..
     tempModel       = DataConstrains(tempModel,flux.byProds,flux.byP_flux(i,:),1.1);
     tempModel       = setParam(tempModel,'ub',positionsEC(1),flexGUR);
@@ -95,3 +98,9 @@ for i=1:length(flux.conds)
     save(fullfile('..','models',['ecModel_P_' flux.conds{i}]), ['ecModelP_' flux.conds{i}]);
     writetable(modificationsT,fullfile('..','results','modelGeneration',['modifiedEnzymes_' flux.conds{i} '.txt']),'Delimiter','\t')
 end
+
+
+clear abundances ans coverage ecModel ecModel_batch ecModelP* enzIndex
+clear enzModel expData f filtAbundances flexGUR GAM grouping i iA j
+clear matchedEnz modificationsT oxPhos params pIDs positionsEC Ptot
+clear rxnIndex solution sumP sumPfilt tempModel tempSol usagesT

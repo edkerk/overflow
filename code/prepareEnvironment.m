@@ -7,6 +7,8 @@ code = pwd();
 % Clone GECKO and checkout version 2.0.0. GECKO will not be tracked in the
 % overflow repository, and this should therefore be run when cloning the
 % overflow repository.
+% Running git from MATLAB requires that MATLAB-git is added to the MATLAB
+% path, this can be obtained here: https://github.com/edkerk/MATLAB-git
 if ~exist('GECKO', 'dir')
     git('clone https://github.com/SysBioChalmers/GECKO.git')
     cd GECKO
