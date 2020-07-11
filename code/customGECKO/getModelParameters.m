@@ -7,6 +7,9 @@ function parameters = getModelParameters
 %   Ivan Domenzain. Last edited: 2020-01-20
 %
 
+%Set GAM
+parameters.GAM = 34;
+
 %Average enzyme saturation factor
 parameters.sigma = 1;
 
