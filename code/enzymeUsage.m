@@ -56,7 +56,7 @@ else
     capUsage    = absUsage./UB;
 end
 
-if true(iszero)
+if true(~zero)
     nonzero     = absUsage>0;
     absUsage    = absUsage(nonzero);
     capUsage    = capUsage(nonzero);

@@ -26,11 +26,13 @@ Temporary Items
 .apdisk
 
 # MATLAB
-#############
 *.asv
 
+# R
+.Rhistory
+.RData
+
 # Binaries
-#############
 *.docx
 *.doc
 *.xlsx
@@ -44,3 +46,4 @@ Temporary Items
 #############
 code/GECKO
 code/ecModels
+code/yeast-GEM
