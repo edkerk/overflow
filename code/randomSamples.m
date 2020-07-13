@@ -23,7 +23,7 @@ for i=1:length(flux.conds)
     models{i}=scaleBioMass(model,flux.Ptot(i),GAM,true);
     [~,Ptot,Ctot,Rtot,Dtot] = sumBioMass(models{i});
     GAECpol(1:4,i) = [Ptot Ctot Rtot Dtot] .* params.pol_cost;
-    GAECpol(5,i) = sum(GAECpol(:,i));
+    GAECpol(5,i) = sum(GAECpol(1:4,i));
     GAECpol(6:7,i) = [34; GAECpol(5,i) + 34];    
     % Set exchange reactions to 95-105% of measured values
     meas = [flux.GUR(i) flux.OxyUptake(i) flux.CO2prod(i) flux.byP_flux(i,:) flux.Drate(i)];
@@ -91,6 +91,7 @@ fluxes=[fluxes;NAD];
 % Polymerization cost of biomass
 fluxes=[fluxes;GAECpol];
 
+% Define row and variable names
 rowNames=[{'rGlu','ETC_rATP','ETC_YATP_glu','ETC_YATP_mu','glycolysis_rATP',...
     'glycolysis_YATP_glu','glycolysis_YATP_mu','GAEC_rATP','GAEC_YATP_glu',...
     'GAEC_YATP_mu','NGAM_rATP','NGAM_YATP_glu','NGAM_YATP_mu','GAEC+NGAM_rATP',...
