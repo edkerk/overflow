@@ -1,4 +1,4 @@
-protID	subSys	CN04	CN22	CN38	CN78	hGR
+protID	subSys	CN4	CN22	CN38	CN78	hGR
 A2P2R3	Alanine, aspartate and glutamate metabolism	0	0	0	0	0
 A2P2R3	Amino sugar and nucleotide sugar metabolism	0	0	0	0	0
 A2P2R3	Biosynthesis of antibiotics	0	0	0	0	0

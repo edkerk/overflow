@@ -10,35 +10,6 @@ capSum <- rowSums(capUse[,3:7])
 capUse <- capUse[!capSum==0,]
 capUse[,3:7] <- capUse[,3:7]*100
 
-# Plot all subsystems as annotated in yeast-GEM (first reorganize for ggplot)
-subSys <- gather(capUse, 'Condition', 'Usage', 3:7)
-
-ggplot(subSys, aes(x = Condition, y = Usage)) +
-  geom_boxplot(lwd=0.35) +
-  facet_wrap(vars(subSys)) +
-  labs(x = '', y = 'Capacity usage (%)', color='') + 
-  theme_classic() +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5), text = element_text(size=7), 
-        line = element_line(size=0.15), strip.background = element_rect(size=0.15),
-        axis.line = element_line(size=0.15))
-ggsave("allSubSysUsage.pdf", width=30, height=40, units="cm")
-
-# Plot selected selected subsystems as annotated in yeast-GEM
-dat <- subSys$subSys %in% c('Glycolysis','Citrate cycle (TCA cycle)','Oxidative phosphorylation','Ribosome (main subunits)')
-dat <- subSys[dat,]
-dat$subSys <- factor(dat$subSys, levels=c('Glycolysis','Citrate cycle (TCA cycle)','Oxidative phosphorylation','Ribosome (main subunits)'))
-
-ggplot(dat, aes(x = Condition,y = Usage, color = subSys)) +
-  geom_boxplot(lwd=0.35) +
-  scale_color_manual(values=c('#C4C6C6','#64A5A3','#64A5A3','#72788D')) +
-  facet_grid(. ~ subSys) +
-  labs(x = '', y = 'Capacity usage (%)', color='') + 
-  theme_classic() +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5), text = element_text(size=7), 
-        line = element_line(size=0.15), strip.background = element_rect(size=0.15),
-        axis.line = element_line(size=0.15))
-ggsave("selectedSubSysUsage.pdf", width=15, height=4.5, units='cm')
-
 # Plot based on GO term annotation as obtained from Uniprot (first rearrange data)
 GO <- read.delim('../../data/selectedAnnotation.txt', stringsAsFactors = F)
 glycolysis <- GO$Entry[GO$system == 'Glycolysis']

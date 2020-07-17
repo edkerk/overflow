@@ -48,25 +48,6 @@ for i=1:numel(ecModels)
 end
 
 %% All usage per subSystem
-head={'protID','subSys','CN04','CN22','CN38','CN78','hGR'};
+head={'protID','subSys','CN4','CN22','CN38','CN78','hGR'};
 all=cell2table([usages.enzymes,usages.subSys,num2cell(usages.capUse)],'VariableNames',head);
 writetable(all,fullfile('..','results','enzymeUsage','enzymeCapUsages.txt'),'Delimiter','\t')
-
-% %% Summarize per subSystem
-% subSysUse.subSys = unique(usages.subSys);
-% [Lia, Locb]=ismember(usages.subSys,subSysUse.subSys);
-% for i=1:numel(ecModels)
-%     for j=1:numel(subSysUse.subSys)
-%         subSysUse.capUse(j,i) = mean(usages.capUse(Locb==j,i));
-%         subSysUse.absUse(j,i) = mean(usages.absUse(Locb==j,i));
-%         subSysUse.over50use(j,i) = numel(find(usages.capUse(Locb==j,i)>0.50));
-%     end
-% end
-% subSysUse.subSys=regexprep(subSysUse.subSys,'^sce\d{5}  ','');
-% 
-% out=[subSysUse.subSys, num2cell(subSysUse.capUse), num2cell(subSysUse.absUse)];
-% head = {'subSys', 'capUse_CN04', 'capUse_CN22', 'capUse_CN38', 'capUse_CN78', ...
-%     'capUse_hGR', 'absUse_CN04', 'absUse_CN22', 'absUse_CN38', 'absUse_CN78', ...
-%     'absUse_hGR'};
-% out=cell2table(out,'VariableNames',head);
-% writetable(out,fullfile('..','results','enzymeUsage','subSysUsage.txt'),'Delimiter','\t')

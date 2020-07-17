@@ -1,5 +1,4 @@
 # Mac OS X
-#############
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -39,11 +38,10 @@ Temporary Items
 *.xls
 
 # Temporary (Office) files
-#############
 ~$*
+scrap/
 
 # Cloned repositories
-#############
 code/GECKO
 code/ecModels
 code/yeast-GEM
