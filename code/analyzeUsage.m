@@ -28,10 +28,10 @@ out(:,1)=ecModels{1}.enzymes;
 out(:,2)=ecModels{1}.enzGenes;
 out(:,3)=ecModels{1}.enzNames;
 for i=1:5
-    out(:,3+i)=cellstr(num2str(capUsage{i},3));
+    out(:,3+i)=strtrim(cellstr(num2str(capUsage{i},3)));
 end
 for i=1:5
-    out(:,8+i)=cellstr(num2str(absUsage{i},3));
+    out(:,8+i)=strtrim(cellstr(num2str(absUsage{i},3)));
 end
 
 %% All usage per subSystem

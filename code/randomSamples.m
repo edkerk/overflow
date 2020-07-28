@@ -105,7 +105,7 @@ rowNames=[{'rGlu','ETC_rATP','ETC_YATP_glu','ETC_YATP_mu','glycolysis_rATP',...
 varNames={'CN4','CN22','CN38','CN78','hGR'};
 
 for i=1:5
-    fluxes2(:,i)=cellstr(num2str(fluxes(:,i),4));
+    fluxes2(:,i)=strtrim(cellstr(num2str(fluxes(:,i),4)));
 end
 fluxes=cell2table(fluxes2,'RowNames',rowNames,'VariableNames',varNames);   
 writetable(fluxes,'../results/randomSampling/selectedFluxes.txt','WriteRowNames',true,'Delimiter','\t')
