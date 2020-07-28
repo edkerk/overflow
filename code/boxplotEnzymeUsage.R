@@ -13,30 +13,24 @@ capUse[,4:8] <- capUse[,4:8]*100
 
 # Plot based on GO term annotation as obtained from Uniprot (first rearrange data)
 GO <- read.delim('../../data/selectedAnnotation.txt', stringsAsFactors = F)
-glycolysis <- GO$Entry[GO$system == 'Glycolysis']
-ribosome <- GO$Entry[GO$system == 'Ribosome']
-ETC <- GO$Entry[GO$system == 'ETC']
-TCA <- GO$Entry[GO$system == 'TCA']
-glycolysis <- capUse[capUse$protID %in% glycolysis,]
-glycolysis$subSys = 'Glycolysis'
-ribosome <- capUse[capUse$protID %in% ribosome,]
-ribosome$subSys = 'Ribosome'
-ETC <- capUse[capUse$protID %in% ETC,]
-ETC$subSys = 'ETC'
-TCA <- capUse[capUse$protID %in% TCA,]
-TCA$subSys = 'TCA cycle'
 
-dat <- rbind(glycolysis,ribosome,ETC,TCA)
-dat <- unique(dat)
-colnames(dat) <- gsub('capUse_','',colnames(dat))
-dat <- gather(dat, 'Condition', 'Usage', 4:8)
-dat$subSys <- factor(dat$subSys, levels=c('Glycolysis','TCA cycle','ETC','Ribosome'))
-dat$Condition <- factor(dat$Condition, levels=c('CN4','CN22','CN38','CN78','hGR'))
+# Only keep data from relevant GO terms
+capUse <- capUse[capUse$protID %in% GO$Entry,]
+idx <- match(capUse$protID, GO$Entry)
+capUse$GOterm <- gsub('TCA','TCA cycle',GO$system[idx])
+colnames(capUse) <- gsub('capUse_','',colnames(capUse))
 
-ggplot(dat, aes(x = Condition, y = Usage, color=subSys)) +
+capUse <- capUse %>% mutate_if(is.numeric, round, digits = 3)
+write_delim(capUse,'../../results/enzymeUsage/capUsage.txt',delim = '\t')
+
+capUse <- gather(capUse, 'Condition', 'Usage', 4:8)
+capUse$GOterm <- factor(capUse$GOterm, levels=c('Glycolysis','TCA cycle','ETC','Ribosome'))
+capUse$Condition <- factor(capUse$Condition, levels=c('CN4','CN22','CN38','CN78','hGR'))
+
+ggplot(capUse, aes(x = Condition, y = Usage, color=GOterm)) +
   geom_boxplot(lwd = 0.35) +
   scale_color_manual(values=c('#CBBBA0','#1D1D1B','#1D71B8','#878787')) +
-  facet_grid(. ~ subSys) +
+  facet_grid(. ~ GOterm) +
   labs(x = '', y = 'Capacity usage (%)') + 
   theme_classic() +
   theme(axis.text.x=element_text(angle = 90, vjust = 0.5), text = element_text(size=7), 
