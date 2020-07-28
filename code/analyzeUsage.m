@@ -33,9 +33,13 @@ end
 for i=1:5
     out(:,8+i)=strtrim(cellstr(num2str(absUsage{i},3)));
 end
+for i=1:5
+    out(:,13+i)=strtrim(cellstr(num2str(UB{i},3)));
+end
 
 %% All usage per subSystem
 head={'protID','geneID','protName','capUse_CN4','capUse_CN22','capUse_CN38','capUse_CN78',...
-    'capUse_hGR','absUse_CN4','absUse_CN22','absUse_CN38','absUse_CN78','absUse_hGR'};
+    'capUse_hGR','absUse_CN4','absUse_CN22','absUse_CN38','absUse_CN78','absUse_hGR',...
+    'UB_CN4','UB_CN22','UB_CN38','UB_CN78','UB_hGR'};
 out=cell2table(out,'VariableNames',head);
 writetable(out,fullfile('..','results','enzymeUsage','enzymeUsages.txt'),'Delimiter','\t')
