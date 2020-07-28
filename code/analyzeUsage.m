@@ -14,7 +14,6 @@ ecModels{3}=ecModelP_CN38;
 ecModels{4}=ecModelP_CN78;
 ecModels{5}=ecModelP_hGR;
 
-format shortE
 %% Get enzymes usages to each reaction
 for i=1:5
     disp(['Now testing: ' flux.conds{i}])

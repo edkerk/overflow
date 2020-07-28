@@ -67,12 +67,15 @@ fluxes(10,:)=fluxes(8,:)./flux.Drate'; % GAEC YATP_mu
 fluxes(11,:)=out.mean(idxs(8),:); % NGAM rATP
 fluxes(12,:)=fluxes(11,:)./rGlu; % NGAM YATP_glu
 fluxes(13,:)=fluxes(11,:)./flux.Drate'; % NGAM YATP_mu
-fluxes(14,:)=fluxes(8,:)+fluxes(11,:); % NGAM+GAEC rATP
-fluxes(15,:)=fluxes(9,:)+fluxes(12,:); % NGAM+GAEC YATP_glu
-fluxes(16,:)=fluxes(10,:)+fluxes(13,:); % NGAM+GAEC YATP_mu
+fluxes(14,:)=fluxes(2,:)+fluxes(5,:)-fluxes(8,:)-fluxes(11,:); % Metabolism rATP
+fluxes(15,:)=fluxes(3,:)+fluxes(6,:)-fluxes(9,:)-fluxes(12,:); % Metabolism YATP_glu
+fluxes(16,:)=fluxes(4,:)+fluxes(7,:)-fluxes(10,:)-fluxes(13,:); % Metabolism YATP_mu
+fluxes(17,:)=fluxes(8,:)+fluxes(11,:)+fluxes(14,:); % NGAM+GAEC+Metabolism rATP
+fluxes(18,:)=fluxes(9,:)+fluxes(12,:)+fluxes(15,:); % NGAM+GAEC+Metabolism YATP_glu
+fluxes(19,:)=fluxes(10,:)+fluxes(13,:)+fluxes(16,:); % NGAM+GAEC+Metabolism YATP_mu
 
 % Primary NAD turnover reactions
-fluxes(17:21,:)=out.mean(idxs(11:15),:); % rPDH, rIDH, rMDHc, rMDHm, rNDE
+fluxes(20:24,:)=out.mean(idxs(11:15),:); % rPDH, rIDH, rMDHc, rMDHm, rNDE
 
 % Flux rates related to NAD turnover, per compartment
 NADmets=find(strcmp(model.metNames,'NAD'));
@@ -94,13 +97,17 @@ fluxes=[fluxes;GAECpol];
 % Define row and variable names
 rowNames=[{'rGlu','ETC_rATP','ETC_YATP_glu','ETC_YATP_mu','glycolysis_rATP',...
     'glycolysis_YATP_glu','glycolysis_YATP_mu','GAEC_rATP','GAEC_YATP_glu',...
-    'GAEC_YATP_mu','NGAM_rATP','NGAM_YATP_glu','NGAM_YATP_mu','GAEC+NGAM_rATP',...
-    'GAEC+NGAM_YATP_glu','GAEC+NGAM_YATP_mu','rPDH','rIDH','rMDHc','rMDHm',....
-    'rNDE'}, NADmets, {'GAECpol_Prot','GAECpol_Carb','GAECpol_RNA','GAECpol_DNA',...
-    'GAECpol_total','GAEC_noPol','GAEC_total'}];
+    'GAEC_YATP_mu','NGAM_rATP','NGAM_YATP_glu','NGAM_YATP_mu','Metabolism_rATP',...
+    'Metabolism_YATP_glu','Metabolism_YATP_mu','GAEC+NGAM+Metabolism_rATP',...
+    'GAEC+NGAM+Metabolism_YATP_glu','GAEC+NGAM+Metabolism_YATP_mu','rPDH',...
+    'rIDH','rMDHc','rMDHm','rNDE'}, NADmets, {'GAECpol_Prot','GAECpol_Carb',...
+    'GAECpol_RNA','GAECpol_DNA','GAECpol_total','GAEC_noPol','GAEC_total'}];
 varNames={'CN4','CN22','CN38','CN78','hGR'};
 
-fluxes=cell2table(num2cell(fluxes),'RowNames',rowNames,'VariableNames',varNames);   
+for i=1:5
+    fluxes2(:,i)=cellstr(num2str(fluxes(:,i),4));
+end
+fluxes=cell2table(fluxes2,'RowNames',rowNames,'VariableNames',varNames);   
 writetable(fluxes,'../results/randomSampling/selectedFluxes.txt','WriteRowNames',true,'Delimiter','\t')
 
 %% Write all random sampling results (means and standard deviations)
