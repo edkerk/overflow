@@ -91,6 +91,20 @@ NADmets=[strcat('rNAD[',model.comps(model.metComps(NADmets(~zeroFlux))),']'); ..
     'rNAD[tot]']';
 fluxes=[fluxes;NAD];
 
+% NADPH
+NADPmets=find(strcmp(model.metNames,'NADP(+)'));
+[~,NADPrxns]=find(model.S(NADPmets,:)); clear NADP
+for i=1:numel(models)
+    NADPtmp=full(models{i}.S(NADPmets,NADPrxns).*out.mean(NADPrxns,i)');
+    NADPtmp(NADPtmp<0)=0;
+    NADP(:,i)=sum(NADPtmp,2);
+end
+zeroFlux=sum(NADP,2)==0;
+NADP=[NADP(~zeroFlux,:);sum(NADP,1)];
+NADPmets=[strcat('rNADP[',model.comps(model.metComps(NADPmets(~zeroFlux))),']'); ...
+    'rNADP[tot]']';
+fluxes=[fluxes;NADP];
+
 % Polymerization cost of biomass
 fluxes=[fluxes;GAECpol];
 
@@ -100,7 +114,7 @@ rowNames=[{'rGlu','ETC_rATP','ETC_YATP_glu','ETC_YATP_mu','glycolysis_rATP',...
     'GAEC_YATP_mu','NGAM_rATP','NGAM_YATP_glu','NGAM_YATP_mu','Metabolism_rATP',...
     'Metabolism_YATP_glu','Metabolism_YATP_mu','GAEC+NGAM+Metabolism_rATP',...
     'GAEC+NGAM+Metabolism_YATP_glu','GAEC+NGAM+Metabolism_YATP_mu','rPDH',...
-    'rIDH','rMDHc','rMDHm','rNDE'}, NADmets, {'GAECpol_Prot','GAECpol_Carb',...
+    'rIDH','rMDHc','rMDHm','rNDE'}, NADmets, NADPmets, {'GAECpol_Prot','GAECpol_Carb',...
     'GAECpol_RNA','GAECpol_DNA','GAECpol_total','GAEC_noPol','GAEC_total'}];
 varNames={'CN4','CN22','CN38','CN78','hGR'};
 
