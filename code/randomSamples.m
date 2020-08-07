@@ -14,6 +14,7 @@ exchRxns = {'r_1714' 'r_1992' 'r_1672' 'r_1808' 'r_1634' 'r_1761' 'r_1793' 'r_21
 model = setParam(model,'eq','r_0445',0); % Block formate -> CO2
 model = setParam(model,'ub','r_4046',Inf);
 goodRxns = [];
+goodRxnsNoForm = [];
 
 % Modify models and perform random sampling
 for i=1:length(flux.conds)
@@ -31,19 +32,43 @@ for i=1:length(flux.conds)
     UBs = [-0.95 -0.95 1.05 1.05 1.05 1.05 1.05 1.05] .* meas;
     UBs(UBs == 0) = 0.01; % Allow small amount of non detected overflow metabolite
     
-    models{i}=setParam(models{i},'lb',exchRxns,LBs);
-    models{i}=setParam(models{i},'ub',exchRxns,UBs);
+    % First run random sampling without formate exchange
+    models{i}=setParam(models{i},'lb',exchRxns([1:6,8]),LBs([1:6,8]));
+    models{i}=setParam(models{i},'ub',exchRxns([1:6,8]),UBs([1:6,8]));
     % Constrain model to 95% of max NGAM
     models{i}=setParam(models{i},'obj','r_4046',1);
     sol=solveLP(models{i});
     models{i}=setParam(models{i},'lb','r_4046',0.95*sol.x(getIndexes(models{i},'r_4046','rxns')));
-    % Random sampling
+    % Random sampling. minFlux = false, as internal loops are fine.
     cd(code)
+    [solsnoFrom{i},goodRxnsNoForm]=rs(models{i},5000,true,true,true,goodRxnsNoForm,false);
+    
+    outNoForm(:,i)=full(mean(solsnoFrom{i},2));
+    
+    % Rerun random sampling with measured formate
+    models{i}=setParam(models{i},'lb',exchRxns,LBs);
+    models{i}=setParam(models{i},'ub',exchRxns,UBs);
+    % Constrain model to 95% of max NGAM
+    models{i}=setParam(models{i},'lb','r_4046',0);
+    models{i}=setParam(models{i},'obj','r_4046',1);
+    sol=solveLP(models{i});
+    models{i}=setParam(models{i},'lb','r_4046',0.95*sol.x(getIndexes(models{i},'r_4046','rxns')));
+    % Random sampling
     [sols{i},goodRxns]=rs(models{i},5000,true,true,true,goodRxns,true);
     
     out.mean(:,i)=full(mean(sols{i},2));
     out.std(:,i)=full(std(sols{i},0,2));
 end
+
+%% Predicted overflow metabolites from random sampling (result: formate)
+[~,idx]=getExchangeRxns(models{1});
+exch=find(sum(outNoForm(idx,:)>0.001,2));
+idx=idx(exch);
+
+varNames={'ID','Reaction name','CN4','CN22','CN38','CN78','hGR'};
+exch=cell2table([models{1}.rxns(idx), models{1}.rxnNames(idx), ...
+    num2cell(outNoForm(idx,:))], 'VariableNames', varNames);
+writetable(exch,'../results/randomSampling/altExchangeFlux.txt','Delimiter','\t')
 
 %% Write selected reaction fluxes, yields and turnover
 fluxRxns={'r_0226','r_1022','r_0892','r_0962','r_4235','r_0886','r_0534',...
