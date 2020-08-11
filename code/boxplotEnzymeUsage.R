@@ -25,7 +25,7 @@ write_delim(capUse,'../../results/enzymeUsage/capUsage.txt',delim = '\t')
 
 capUse <- gather(capUse, 'Condition', 'Usage', 4:8)
 capUse$GOterm <- factor(capUse$GOterm, levels=c('Glycolysis','TCA cycle','ETC','PP shunt','THF cycle','Ribosome'))
-capUse$Condition <- factor(capUse$Condition, levels=c('CN4','CN22','CN38','CN78','hGR'))
+capUse$Condition <- factor(capUse$Condition, levels=c('CN4','CN22','CN38','CN75','hGR'))
 
 plot1<-capUse[capUse$GOterm %in% c('Glycolysis','TCA cycle','ETC','Ribosome'),]
 ggplot(plot1, aes(x = Condition, y = Usage, color=GOterm)) +

@@ -7,13 +7,13 @@ clear oxPhos params positionsEC grouping ecModel ecModel_batch f
 load('../models/ecModel_P_CN4.mat')
 load('../models/ecModel_P_CN22.mat')
 load('../models/ecModel_P_CN38.mat')
-load('../models/ecModel_P_CN78.mat')
+load('../models/ecModel_P_CN75.mat')
 load('../models/ecModel_P_hGR.mat')
 
 ecModels{1}=ecModelP_CN4;
 ecModels{2}=ecModelP_CN22;
 ecModels{3}=ecModelP_CN38;
-ecModels{4}=ecModelP_CN78;
+ecModels{4}=ecModelP_CN75;
 ecModels{5}=ecModelP_hGR;
 
 %% Load ribosome information

@@ -5,13 +5,13 @@
 load('../models/ecModel_P_CN4.mat')
 load('../models/ecModel_P_CN22.mat')
 load('../models/ecModel_P_CN38.mat')
-load('../models/ecModel_P_CN78.mat')
+load('../models/ecModel_P_CN75.mat')
 load('../models/ecModel_P_hGR.mat')
 
 ecModels{1}=ecModelP_CN4;
 ecModels{2}=ecModelP_CN22;
 ecModels{3}=ecModelP_CN38;
-ecModels{4}=ecModelP_CN78;
+ecModels{4}=ecModelP_CN75;
 ecModels{5}=ecModelP_hGR;
 
 %% Get enzymes usages to each reaction
@@ -38,8 +38,8 @@ for i=1:5
 end
 
 %% All usage per subSystem
-head={'protID','geneID','protName','capUse_CN4','capUse_CN22','capUse_CN38','capUse_CN78',...
-    'capUse_hGR','absUse_CN4','absUse_CN22','absUse_CN38','absUse_CN78','absUse_hGR',...
-    'UB_CN4','UB_CN22','UB_CN38','UB_CN78','UB_hGR'};
+head={'protID','geneID','protName','capUse_CN4','capUse_CN22','capUse_CN38','capUse_CN75',...
+    'capUse_hGR','absUse_CN4','absUse_CN22','absUse_CN38','absUse_CN75','absUse_hGR',...
+    'UB_CN4','UB_CN22','UB_CN38','UB_CN75','UB_hGR'};
 out=cell2table(out,'VariableNames',head);
 writetable(out,fullfile('..','results','enzymeUsage','enzymeUsages.txt'),'Delimiter','\t')

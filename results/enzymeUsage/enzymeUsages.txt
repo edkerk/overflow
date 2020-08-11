@@ -1,4 +1,4 @@
-protID	geneID	protName	capUse_CN4	capUse_CN22	capUse_CN38	capUse_CN78	capUse_hGR	absUse_CN4	absUse_CN22	absUse_CN38	absUse_CN78	absUse_hGR	UB_CN4	UB_CN22	UB_CN38	UB_CN78	UB_hGR
+protID	geneID	protName	capUse_CN4	capUse_CN22	capUse_CN38	capUse_CN75	capUse_hGR	absUse_CN4	absUse_CN22	absUse_CN38	absUse_CN75	absUse_hGR	UB_CN4	UB_CN22	UB_CN38	UB_CN75	UB_hGR
 A2P2R3	YMR084W	YMR084W	0	0	0	0	0	0	0	0	0	0	Inf	Inf	Inf	Inf	Inf
 O13525	YDR204W	COQ4	0	0	0	0	0	0	0	0	0	0	3.31e-07	Inf	1.85e-07	1.61e-07	Inf
 P00044	YJR048W	CYC1	0	0	0	0	0	2.52e-08	2.99e-08	8.08e-09	2.86e-08	2.83e-08	Inf	Inf	Inf	Inf	Inf
